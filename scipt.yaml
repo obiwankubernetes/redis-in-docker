@@ -1,0 +1,82 @@
+# Redis 
+
+## Docker image of redis
+
+Find Docker image @(https://hub.docker.com/_/redis)
+
+## Running redis
+
+# create network named redis
+docker network create redis
+# run redis imagew/ 6.0 alpine tag on the created redis network remove when done and exposing this port
+docker run -it --rm --name redis --net redis -p 6379:6379 redis:6.0-alpine
+
+
+## Configuration
+
+# Start at Redis configuration documentation @ (https://redis.io/topics/config)
+
+# now customize it with redis.conf in config dir
+
+# make sure we are in our main directory
+cd .\
+# mount into container the config folder into etc/redis dir of container, start redis container and run redis server as entry point and point it to the folder of container where redis.config was mounted
+docker run -it --rm --name redis --net redis -v ${PWD}/config:/etc/redis/ redis:6.0-alpine redis-server /etc/redis/redis.conf
+
+
+## Security
+
+# Redis should not be exposed to public.
+# Always use a strong password in `redis.conf` -> ctrl+f requirepass in redis.conf
+
+requirepass SuperSecretSecureStrongPass
+
+
+## mount Persistence volume for storing data
+
+# Redis Persistence Documentation @ (https://redis.io/topics/persistence)
+
+# create pv for redis
+docker volume create redis
+# make sure we are in our main dir
+cd .\
+# same command before but run with mounting pv <-v> into /data folder in container
+docker run -it --rm --name redis --net redis -v ${PWD}/config:/etc/redis/ -v redis:/data/  redis:6.0-alpine redis-server /etc/redis/redis.conf
+
+
+## Redis client applicationv
+# an example application that reads a key from Redis, increments it and writes it back to Redis.
+
+# cd into application/client directory
+cd .\applications\client\
+
+# start go dev environment
+docker run -it -v ${PWD}:/go/src -w /go/src --net redis -p 80:80 golang:1.14-alpine
+
+go build client.go
+# start the app
+./client
+
+# build the container
+docker build . -t aimvector/redis-client:v1.0.0
+
+```
+
+Run our application
+
+```
+cd .\storage\redis\applications\client\
+docker build . -t aimvector/redis-client:v1.0.0
+
+docker run -it --net redis `
+-e REDIS_HOST=redis `
+-e REDIS_PORT=6379 `
+-e REDIS_PASSWORD="SuperSecretSecureStrongPass" `
+-p 80:80 `
+aimvector/redis-client:v1.0.0
+
+```
+
+## Redis Replication and High Availability
+
+Lets move on to the [clustering](./clustering/readme.md) secion.
