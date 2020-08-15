@@ -1,5 +1,6 @@
 package main
 
+// import libraries
 import (
 	"fmt"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"strconv"
 )
 
+// create variables
 var redis_host = os.Getenv("REDIS_HOST")
 var redis_port = os.Getenv("REDIS_PORT") 
 var redis_password = os.Getenv("REDIS_PASSWORD")
@@ -19,6 +21,7 @@ var ctx = context.Background()
 var rdb *redis.Client
 
 var counter = 0
+// create main functino to init web app that print incremented redis count
 func main() {
 
 	r := redis.NewClient(&redis.Options{
@@ -38,6 +41,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":80", router))
 }
 
+// create function to increment redis key
 func increment_redis_key(writer http.ResponseWriter, request *http.Request, p httprouter.Params) {
 	
     val, err := rdb.Get(ctx, "counter").Result()

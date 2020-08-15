@@ -47,13 +47,17 @@ docker run -it --rm --name redis --net redis -v ${PWD}/config:/etc/redis/ -v red
 ## Redis client applicationv
 # an example application that reads a key from Redis, increments it and writes it back to Redis.
 
-# cd into application/client directory
+# pathway into applications/client dir where client.go (app file) exists
 cd .\applications\client\
 
 # start go dev environment
 docker run -it -v ${PWD}:/go/src -w /go/src --net redis -p 80:80 golang:1.14-alpine
 
+# build client.go app
 go build client.go
+
+# will create go.mod file -> similar to reqs.txt in python
+
 # start the app
 ./client
 
@@ -65,9 +69,11 @@ docker build . -t aimvector/redis-client:v1.0.0
 Run our application
 
 ```
-cd .\storage\redis\applications\client\
+# pathway into applications/client dir where client.go (app file) exists
+cd .\applications\client\
 docker build . -t aimvector/redis-client:v1.0.0
 
+# run app from docker with environmnet variables
 docker run -it --net redis `
 -e REDIS_HOST=redis `
 -e REDIS_PORT=6379 `
@@ -75,8 +81,6 @@ docker run -it --net redis `
 -p 80:80 `
 aimvector/redis-client:v1.0.0
 
-```
+# go to local host and refresh page to see counter is working
 
-## Redis Replication and High Availability
-
-Lets move on to the [clustering](./clustering/readme.md) secion.
+# then ctrl c to stop the app running, then run the app again to make sure redis is persisting
